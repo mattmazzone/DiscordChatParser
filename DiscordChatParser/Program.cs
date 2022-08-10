@@ -1,53 +1,35 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
-namespace DiscordChatParser {
+namespace DiscordChatParser
+{
     class Program
     {
         static void Main()
         {
 
 
-            using StreamReader r = new(@"C:\Users\matte\source\repos\DiscordChatParser\DiscordChatParser\MauxyLogsChannel.json");
-            // Read and parse json file
-            string json = r.ReadToEnd();
-            JObject jsonObj = JObject.Parse(json);
-
-            JToken? jsonToken = jsonObj["messages"];
-            if (jsonToken is null)
+            using StreamReader r = new(@"..\..\..\MauxyLogsChannel.json");
+            using JsonReader jsonReader = new JsonTextReader(r);
             {
-                Console.WriteLine("Json token is null");
-                return;
-            }
-
-            // Convert to string
-            string results = jsonToken.ToString();
-
-            var messageList = JsonConvert.DeserializeObject<List<Messages>>(results);
-
-            foreach (Messages message in messageList)
-            {
+                JsonSerializer serializer = new JsonSerializer();
+                var messageList = serializer.Deserialize<List<Messages>>(jsonReader);
 
 
-                
-    
-            if (message.Embeds.Count > 0)
+                foreach (var message in messageList)
                 {
-                    string name = Utils.GetDiscordNameFromDescription(message.Embeds[0].Description);
-                    string action = Utils.GetActionFromDescription(message.Embeds[0].Description);
-                    string channel = Utils.GetTargetChannel(message.Embeds[0].Description);
-
-                Console.WriteLine(name + " " + action + " " + channel + " at " + message.Timestamp);
+                    Console.WriteLine(message.Id);
                 }
+                Console.WriteLine(messageList.Count);
+
+
 
             }
+
         }
-
-
-
     }
 
-    class Messages {
+    class Messages
+    {
         public string? Id { get; set; }
         public string? Type { get; set; }
         public string? Timestamp { get; set; }
